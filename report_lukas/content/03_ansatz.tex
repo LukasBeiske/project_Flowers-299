@@ -1,2 +1,43 @@
 \section{Solution approach using a CNN}
 \label{sec:ansatz}
+The most successful approach to image recognition based an machine learing algorithms is the use of \textit{Convolutional Neural Networks} (CNN).
+CNNs can use multidimensional input arrays which is their main advantage compared to \enquote{normal} fully-connected neural networks for working with image data, 
+as the information of the position of each pixel compared to its neighbors is not lost by flattening the pixel-values in an one dimensional array.
+This is done by repeatedly applying weight-matrices of size $N_\text{kernal}\times M_\text{kernal}$ called \textit{kernals} on the image, while moving the kernal from one edge of the image to the other 
+whereby the steps size (referring to the number of pixel-rows/ -columns that the kernal is moved by in each step) is called \textit{stride}.
+This allows CNNs to learn geometric shapes within the images it is trained on.
+Because we want to classify the images into the eleven flower species, we also add a small fully-connected neural network after the CNN structure, so that the final output of our
+neural network are eleven scores for each image which describe how likely the image shows a flower(s) of each of the eleven species.
+A subsequent final assignment to one of the species can be done by choosing the species with the highest score.
+
+% loss and accuracy 
+
+\subsection{First network and manual hyperparameter tuning}
+Due to our preprocessing the shape of the input data is $200\times 200\times 3$, where the last dimension represents the three RGB color channels. 
+We start by trying different structures for the network to get a basic of idea of which type of network would work for our problem.
+This leds to a network with three convolutional layers, each followed by a MaxPooling layer to stabilize the performance of the network against slight displacement or rotation of certain shapes 
+in different images. % padding ?!
+MaxPooling layers take the maximal value of a $N_\text{pool}\times N_\text{pool}$ subspace of each of the two-dimensional arrays of the three-dimensional input and return it as the single output 
+for each of those subspaces.
+After this convolutional part of the network we add two hidden fully-connected layers before the output layer, because a second hidden layer seems to improve the result.
+
+As \textbf{activation functions} we use the \textit{ReLU} function for all layers but the output layer, for which we use the \textit{softmax} function.
+This choice of activation functions makes it possible to interpret the output scores of the network as real probabilities of the image showing a flower of the given species.
+
+Regarding the \textbf{number of kernals} in each convolutional layer, an increasing number of kernals seems to work best and we choose to double the number of kernals in each layer.
+For the MaxPooling layers we choose $\symbf{N_\text{pool}} = 2$ as any larger number decreases the image size too fast.
+The combination of an increasing number and kernals with pooling layers after each convolutional layer effectively leads to a compression of the first two dimensions (height and width of the image) 
+of the data while more information gets transformed into the third dimension (number of kernals or RGB channels in the input layer).
+
+For an image size of $200\times 200$ the kernal must also be quadratic ($N_\text{kernal} = M_text{kernal}$) and a \textbf{kernal size} of $N_\text{kernal} = 4$ seems to work well.
+We tried using non-unit \textbf{stride}, but the best result is achieved by using the (default) unit stride which means moving the kernal one pixel-row/ -column at a time over the image.
+
+An overview of the network structure we find based on these manual hyperparameter variations can be found in \autoref{fig:first_model}. 
+
+% adam and learning rate and batch size
+
+
+\subsection{Sequential grid searches for hyperparameter tuning}
+
+
+\subsection{Regularization}
