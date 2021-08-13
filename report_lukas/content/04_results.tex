@@ -1,5 +1,21 @@
 \section{Results and interpretation}
 \label{sec:results}
+Trying different network structures and extensive hyperparameter tuning results in a network which achieves an accuracy of $\SI{84.4}{\percent}$ on the validation set by using the
+hyperparameter values as seen in \autoref{tab:hyperparameters}.
+An overview of the final network can be seen in \autoref{fig:best_model}.
+\begin{table}
+    \centering
+    \caption{A CNN using these hyperparameter values can solve our learning problem the best.}
+    \label{tab:hyperparameters}
+    \begin{tabular}{c c c c c c c}
+        \toprule
+        $N_\text{conv. layers}$ & $\text{num}_\text{kernals}$ & $N_\text{kernal}$ & $N_\text{dense layers}$ & $N_\text{dense nodes}$ & $r_\text{L2}$ & $r_\text{dropout}$ \\
+        \midrule
+        5 & 48 & 4 & 1 & 128 & \num{1e-5} & 0.3\\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
 
 
 \subsection{Alternative method}

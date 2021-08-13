@@ -1,9 +1,31 @@
 \section{Appendix}
 \label{sec:appendix}
+The code for this project can be found on \href{https://github.com/LukasBeiske/project_Flowers-299}{github}.
 
 \begin{figure}
     \centering
     \includegraphics[height=0.9\textheight]{../data/first_model.png}
-    \caption{Overview of the network structure found via manual hyperparameter tuning.}
+    \caption{Schematic overview of the network structure found via manual hyperparameter tuning.}
     \label{fig:first_model}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{../data/performance_plots/first_model.pdf}
+    \caption{The loss and accuracy curves for the initial model based on manual hyperparameter tuning.}
+    \label{fig:first_curves}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{../data/performance_plots/l2.pdf}
+    \caption{The loss and accuracy curves for the three best performing L2-regularization rates $r_\text{L2}$.}
+    \label{fig:l2}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[height=\textheight]{../data/best_model.png}
+    \caption{Schematic overview of the optimal network structure after hyperparameter tuning.}
+    \label{fig:best_model}
 \end{figure}

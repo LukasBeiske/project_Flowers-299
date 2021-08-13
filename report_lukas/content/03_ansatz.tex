@@ -1,6 +1,6 @@
 \section{Solution approach using a CNN}
 \label{sec:ansatz}
-The most successful approach to image recognition based an machine learing algorithms is the use of \textit{Convolutional Neural Networks} (CNN).
+The most successful approach to image recognition based an machine-learing algorithms is the use of \textit{Convolutional Neural Networks} (CNN).
 CNNs can use multidimensional input arrays which is their main advantage compared to \enquote{normal} fully-connected neural networks for working with image data, 
 as the information of the position of each pixel compared to its neighbors is not lost by flattening the pixel-values in an one dimensional array.
 This is done by repeatedly applying weight-matrices of size $N_\text{kernal}\times M_\text{kernal}$ called \textit{kernals} on the image, while moving the kernal from one edge of the image to the other 
@@ -10,22 +10,37 @@ Because we want to classify the images into the eleven flower species, we also a
 neural network are eleven scores for each image which describe how likely the image shows a flower(s) of each of the eleven species.
 A subsequent final assignment to one of the species can be done by choosing the species with the highest score.
 
-% loss and accuracy 
+Our problem represents a classification problem with eleven target classes.
+For this type of problem the \textit{categorical cross-entropy} is a good loss function
+\begin{align}
+    CE = -\frac{1}{n} \sum_{i=1}^n \sum_{k=1}^{11} p_{i,k} \ln{y_{i,k}},
+\end{align}
+where $n$ is the number of images used for training, $p_{i,k}$ the target vector with $p_{i,k} = 0$ for all classes but the true class $k'$ of the image $i$ ($p_{i,k'} = 1$) and 
+$y_{i,k}$ the prediction vector with the predicted probabilities of the image being of class $k$.
+As our goal is to correctly classify as many images as possible, the (micro-averaged) \textit{accuracy} of the classification is the most fitting performance metric
+\begin{align}
+    accuracy = \frac{n_\text{correctly classified}}{n}.
+\end{align}
+
 
 \subsection{First network and manual hyperparameter tuning}
-Due to our preprocessing the shape of the input data is $200\times 200\times 3$, where the last dimension represents the three RGB color channels. 
+For constructing, training and applying a neural network we use the \texttt{keras} API for Googles \texttt{TensorFlow} deep-learning library \cite{keras}, 
+while some helper functions from \texttt{scikit-learn} are used \cite{scikit-learn}.
+Due to our preprocessing the shape of the input data is $200\times 200\times 3$, where the last dimension represents the three RGB color channels.
+
 We start by trying different structures for the network to get a basic of idea of which type of network would work for our problem.
-This leds to a network with three convolutional layers, each followed by a MaxPooling layer to stabilize the performance of the network against slight displacement or rotation of certain shapes 
-in different images. % padding ?!
+This leads to a network with three convolutional layers, each followed by a MaxPooling layer to stabilize the performance of the network against slight displacement or rotation of certain shapes 
+in different images. % talk about padding ?
 MaxPooling layers take the maximal value of a $N_\text{pool}\times N_\text{pool}$ subspace of each of the two-dimensional arrays of the three-dimensional input and return it as the single output 
 for each of those subspaces.
-After this convolutional part of the network we add two hidden fully-connected layers before the output layer, because a second hidden layer seems to improve the result.
+After the convolutional part of the network we add two hidden fully-connected layers before the output layer (a second hidden layer improves the accuracy compared with only one hidden layer).
 
 As \textbf{activation functions} we use the \textit{ReLU} function for all layers but the output layer, for which we use the \textit{softmax} function.
 This choice of activation functions makes it possible to interpret the output scores of the network as real probabilities of the image showing a flower of the given species.
 
-Regarding the \textbf{number of kernals} in each convolutional layer, an increasing number of kernals seems to work best and we choose to double the number of kernals in each layer.
-For the MaxPooling layers we choose $\symbf{N_\text{pool}} = 2$ as any larger number decreases the image size too fast.
+Regarding the \textbf{number of kernals} in each convolutional layer, an increasing number of kernals seems to work best and we choose to double the number of kernals in each layer
+starting with 16 kernals in the first layer.
+For the \textbf{MaxPooling} layers we choose $N_\text{pool} = 2$, as any larger number decreases the image size too fast.
 The combination of an increasing number and kernals with pooling layers after each convolutional layer effectively leads to a compression of the first two dimensions (height and width of the image) 
 of the data while more information gets transformed into the third dimension (number of kernals or RGB channels in the input layer).
 
@@ -34,10 +49,113 @@ We tried using non-unit \textbf{stride}, but the best result is achieved by usin
 
 An overview of the network structure we find based on these manual hyperparameter variations can be found in \autoref{fig:first_model}. 
 
-% adam and learning rate and batch size
+For \textbf{training} the network we use the \textit{Adam} algorithm \cite{adam} with the (default) initial learing rate of 0.001 and a batch size of 128.
+We try initial learing rates of 0.01 and 0.0001 and batch sizes of 256 and 64, but these settings do perform significantly worse or slow the training down a lot.
+
+Using the hyperparameter values described so far we achieve an accuracy of 0.749 and the loss and accuracy curves can be seen in \autoref{fig:first_curves}. 
+Do validate the performance of the model we split another $\SI{15}{\percent}$ of the images into a validation set.
+The whole data is hereby split into $\SI{70}{\percent}$ training set, $\SI{15}{\percent}$ validation set and $\SI{15}{\percent}$ test set.
 
 
-\subsection{Sequential grid searches for hyperparameter tuning}
+\subsection{Hyperparameter tuning via sequential grid searches}
+After finding a network structure which performs reasonably well, we perform four sequential grid searches.
+The first search covers the number of nodes in the two hidden fully-connected layers.
+\begin{align}
+    N_\text{dense nodes} \in \{64, 96, 128, 160, 192, 224, 256\}
+\end{align}
+The best accuracy on the validation set (0.770 in training epoch 22) is achieved by using 224 nodes in both layers and the loss and accuracy curves of the three best performing models 
+(in regards to accuracy on the validation set) can be seen in \autoref{fig:GS1}
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{../data/performance_plots/GS1.pdf}
+    \caption{The loss and accuracy curves for the three best performing models in the first grid search.}
+    \label{fig:GS1}
+\end{figure}
+
+In the second search we use more convolutional layers and vary the number of kernals in each layer (still doubling the number from layer to layer).
+\begin{align}
+    N_\text{conv. layers} &\in \{3, 4, 5, 6\} \\
+    \text{num}_\text{kernals} &\in \{8, 16, 24, 32, 40, 48, 64, 80, 96\}
+\end{align}
+For $N_\text{conv. layers} = 3, 4, 5$ we still use a MaxPooling layer after each layer, but for $N_\text{conv. layers} = 6$ we only include a MaxPooling layer every two layers and 
+also double the number of kernals only every two layers.
+This search is done in three parts, because the first two tries result in the model with the largest $\text{num}_\text{kernals}$ tested performing the best.
+Therefore, we deem it necessary to increase the range of $\text{num}_\text{kernals}$ to test.
+$N_\text{conv. layers} = 5$ is also not present in the first part of the search, but in the second part it performs better than $N_\text{conv. layers} = 4$ (which performed best in the first part)
+for all tested number of kernals, which is why only $N_\text{conv. layers} = 5$ is tested in the third part.
+The performance of the four best models in the third part of the search can be seen in \autoref{fig:GS2_ext2}.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{../data/performance_plots/GS2_ext2.pdf}
+    \caption{The loss and accuracy curves for the three best performing models in the third part of the second grid search ($N_\text{conv. layers} = 5$).}
+    \label{fig:GS2_ext2}
+\end{figure}
+Even though the model with $\text{num}_\text{kernals} = 96$ performs the best we choose $\text{num}_\text{kernals} = 48$ as our optimal number of kernals (in the first layer),
+because it performs only slightly worse while representing a much less complex model. 
+Not only are less complex models generally to be preferred over more complex ones, if they perform equally well (\textit{Occam's razor}), but training the model with as big of a capacity as the one 
+with $\text{num}_\text{kernals} = 96$ is so slow, that it would make further hyperparameter tuning extremely difficult, because of our limited computing resources.
+Finally, the model with $N_\text{conv. layers} = 5$ and $\text{num}_\text{kernals} = 48$ achieves a validation accuracy of 0.829 in epoch 32.
+
+The third gird search covers the kernal sizes
+\begin{align}
+    N_\text{kernal} \in \{2, 3, 4, 5, 6\}.
+\end{align}
+$N_\text{kernal} = 6$ is the biggest kernal size that can be applied on the images in the fifth convolutional layer, because the image resolution is reduced to $6\times 6$ in this layer 
+due to the five previous MaxPooling layers.
+Considering that we use the same kernal size in all convolutional layers, this search covers the whole parameter space for this hyperparameter given the restrictions of our network structure.
+The performance of the three best models can be seen in \autoref{fig:GS3} and we conclude, that our previous choice of $N_\text{kernal} = 4$ still performs the best 
+with a validation accuracy of 0.820 in epoch 32.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{../data/performance_plots/GS3.pdf}
+    \caption{The loss and accuracy curves for the three best performing models third gird search.}
+    \label{fig:GS3}
+\end{figure}
+Even though the best model in this search ends up using the exact same hyperparameter values as the optimal model in the previous search, its accuracy is $\SI{0.9}{\percent}$ worse.
+This shows, that it is not possible (or at least within the scope of this project) to make the training results completely reproducible, even though we use fixed seeds for functions using
+random numbers wherever possible. 
+It would make sense to use \textit{cross-validation} to mitigate these random fluctuations, however we do not have the computing resources to do so effectively.
+
+By now the structure of the convolutional part of our network has changed so much, that we deem it necessary to reexamine the structure of the dense part of the network, as it effectively
+receives quite different inputs compared to when we performed the first gird search.
+For this reason we once again try out different values for $N_\text{dense nodes}$ and check if two hidden layers still provide a better accuracy than one.
+\begin{align}
+    N_\text{dense layers} &\in \{1, 2\} \\
+    N_\text{dense nodes} &\in \{64, 128, 192, 256\}
+\end{align}
+We omitted a single layer with $N_\text{dense nodes} = 64$ to speed up the search, because this combination performed much worse than others during the manual hyperparameter search.
+The three models achieving the best validation accuracies can be seen in \autoref{fig:GS4}.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{../data/performance_plots/GS4.pdf}
+    \caption{The loss and accuracy curves for the three best performing models in the fourth gird search.}
+    \label{fig:GS4}
+\end{figure}
+The model with a single hidden layer containing $N_\text{dense nodes} = 128$ nodes performs the best with a validation accuracy of 0.824 in epoch 44.
 
 
 \subsection{Regularization}
+Although the accuracy curves do not show signs of significant overfitting (diminishing validation accuracy in later training epochs), the loss curves show, that the validation loss 
+increases again in later epochs. 
+Therefore, we now try introducing some regularization to our network in an afford to further improve the networks expected performance on new data, as measured by its accuracy on the validation set.
+
+After implementing one \textit{Dropout} layer between the fifth convolutional and the hidden fully-connected layer, and trying different dropout rates $r_\text{dropout}$, we do not see an 
+improved validation accuracy compared to no dropout.
+The next step is using \textit{L2-regularization} in every layer instead and testing different L2-regularization rates
+\begin{align}
+    r_\text{L2} \in \{0, \num{1e-6}, \num{1e-5}, \num{1e-4}, \num{1e-3}\}.
+\end{align}
+This shows the best results when using $r_\text{L2} = \num{1e-5}$ as can be seen in \autoref{fig:l2}.
+
+Finally we try combining dropout and L2 regularization by fixing $r_\text{L2} = \num{1e-5}$ and testing the dropout rates
+\begin{align}
+    r_\text{dropout} \in \{0, 0.1, 0.2, 0.3, 0.4\}.
+\end{align}
+The loss and accuracy curves for the three best models can be seen in \autoref{fig:l2_dropout} and the model with $r_\text{dropout} = 0.3$ achieves the best validation accuracy
+of 0.844 in epoch 57.
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{../data/performance_plots/dropout_l2.pdf}
+    \caption{The loss and accuracy curves for the three best performing models in the search for a combination of L2 and dropout regularization.}
+    \label{fig:l2_dropout}
+\end{figure}
