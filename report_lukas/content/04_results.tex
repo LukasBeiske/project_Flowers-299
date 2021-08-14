@@ -5,18 +5,73 @@ hyperparameter values as seen in \autoref{tab:hyperparameters}.
 An overview of the final network can be seen in \autoref{fig:best_model}.
 \begin{table}
     \centering
-    \caption{A CNN using these hyperparameter values can solve our learning problem the best.}
+    \caption{A CNN using these hyperparameter values can solve our learning problem the best. *= In the first convolutional layer.}
     \label{tab:hyperparameters}
     \begin{tabular}{c c c c c c c}
         \toprule
-        $N_\text{conv. layers}$ & $\text{num}_\text{kernals}$ & $N_\text{kernal}$ & $N_\text{dense layers}$ & $N_\text{dense nodes}$ & $r_\text{L2}$ & $r_\text{dropout}$ \\
+        $N_\text{conv. layers}$ & ${\text{num}_\text{kernals}}^*$ & $N_\text{kernal}$ & $N_\text{dense layers}$ & $N_\text{dense nodes}$ & $r_\text{L2}$ & $r_\text{dropout}$ \\
         \midrule
         5 & 48 & 4 & 1 & 128 & \num{1e-5} & 0.3\\
         \bottomrule
     \end{tabular}
 \end{table}
 
+The final step of every machine-learing based work is the performance evaluation on data that was not used at any point in the work before.
+After the preprocessing we split $\SI{15}{\percent}$ of our data into a test set for this purpose.
+Using our best performing model we achieve
+\begin{align}
+    \text{accuracy}_\text{test} = \SI{79.9}{\percent}.
+\end{align}
+It is also helpful to examine the distribution of the predicted probability for a single species, while distinguishing between the images which truly show a flower(s) of this species and
+all other images.
+This is done in \autoref{fig:hist} for \enquote{Marguerite Daisy}.
+Another import graphic for evaluating a classification is the \textit{confusion matrix} which can be seen in \autoref{fig:matrix}.
+\begin{figure}
+    \centering    
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=0.99\textwidth]{../data/eval_plots_test/One_vs_all_histogram.pdf}
+        \caption{Probability distribution for \enquote{Marguerite Daisy}.}
+        \label{fig:hist}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=0.99\textwidth]{../data/eval_plots_test/confusion_matrix.pdf}
+        \caption{Confusion matrix.}
+        \label{fig:matrix}
+    \end{subfigure}
+    \caption{The predicted probabilities for the class \enquote{Marguerite Daisy} and the confusion matrix based on the test data set help to illustrate the performance of our classification model.}
+\end{figure}
+The probability distribution shows that out network is generally pretty certain in its classification of Marguerite Daisys, as most images (regardless if correctly classified or not) 
+are in the highest or lowest bin.
 
+If we look at both plots, we can see however, that \enquote{Marguerite Daisy} is the class which gets misclassified the most as only 31 of 50 images of Marguerite Daisys in the test set get 
+classified as such.
+They get confused with Waterlilies the most, which, looking at \autoref{fig:images}, could be because of similarities in color and pedal shape.
+However, there are also images of Waterlilies of different colors in our dataset
+So it might be the case, that Waterlilies are the species which is truly hard to correctly classify and the (weak) classification criteria for Waterlilies just happen to also apply to Marguerite Daisys
+quite often.
+Another interesting observation in \autoref{fig:matrix} is, that Butterfly Bushs get confused a lot with Bee Balm flowers and Grape Hyacinths.
+Bee Balm flowers come in very similar colors to Butterfly Bushes and the tattered-looking blossoms of Bee Balm flowers can look very similar to Butterfly Bushs which have already lost some of their 
+blossoms.
+The purple color and general shape of the flower head of Grape Hyacinths can make them look very much like Butterfly Bushs on images.
+In reality the size of the flower head is very different, but this is not an information which our network knows.
+However, real images of Grape Hyacinths do not get misclassified at all within our test set.
+This can be caused by the very distinctive ball-like pedal-shape (see \autoref{fig:images}) which our network can probably detect very accurately. 
+
+The six images which the network misclassifies with the highest certainty in its wrong prediction are shown in \autoref{fig:errors}.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{../data/eval_plots_test/biggest_errors.pdf}
+    \caption{These six images get misclassified with the highest certainty in the wrong prediction.}
+    \label{fig:errors}
+\end{figure}
+The image in the top left looks very similar to a Blanket Flower (like the one in the top middle) and the bottom left bottom middle and top right image are drawings and have
+a white/ white-grey background which probably makes it harder for the network due to a lack of contrast.
+The Waterlilies on the bottom right image are very small and its color is very similar to a Grape Hyacinth, so this misclassification is understandable.
+The only strange misclassification is the image in the top middle.
+A possible explanation is the network detecting something in the background of the image as resembling a Butterfly Bush.
 
 
 \subsection{Alternative method}

@@ -19,7 +19,7 @@ where $n$ is the number of images used for training, $p_{i,k}$ the target vector
 $y_{i,k}$ the prediction vector with the predicted probabilities of the image being of class $k$.
 As our goal is to correctly classify as many images as possible, the (micro-averaged) \textit{accuracy} of the classification is the most fitting performance metric
 \begin{align}
-    accuracy = \frac{n_\text{correctly classified}}{n}.
+    \text{accuracy} = \frac{n_\text{correctly classified}}{n}.
 \end{align}
 
 
@@ -141,6 +141,8 @@ Therefore, we now try introducing some regularization to our network in an affor
 
 After implementing one \textit{Dropout} layer between the fifth convolutional and the hidden fully-connected layer, and trying different dropout rates $r_\text{dropout}$, we do not see an 
 improved validation accuracy compared to no dropout.
+No dropout layer is implemented between the hidden layer and the output layer, as there are too few weights between those two layers.
+Dropout with too few weights is ineffective, because too much information gets lost, when some weights are deactivated.
 The next step is using \textit{L2-regularization} in every layer instead and testing different L2-regularization rates
 \begin{align}
     r_\text{L2} \in \{0, \num{1e-6}, \num{1e-5}, \num{1e-4}, \num{1e-3}\}.
