@@ -4,16 +4,34 @@ The code for this project can be found on \href{https://github.com/LukasBeiske/p
 
 \begin{figure}
     \centering
-    \includegraphics[height=0.9\textheight]{../data/first_model.png}
-    \caption{Schematic overview of the network structure found via manual hyperparameter tuning.}
-    \label{fig:first_model}
+    \includegraphics[width=\textwidth]{../data/performance_plots/first_model.pdf}
+    \caption{The loss and accuracy curves for the initial model based on manual hyperparameter tuning.}
+    \label{fig:first_curves}
+\end{figure}
+
+\begin{figure}
+    \centering    
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[height=0.8\textheight]{../data/first_model.png}
+        \caption{Network structure found via manual hyperparameter tuning.}
+        \label{fig:first_model}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[height=0.95\textheight]{../data/best_model.png}
+        \caption{Optimal network structure.}
+        \label{fig:best_model}
+    \end{subfigure}
+    \caption{Schematic overview of network structures.}
 \end{figure}
 
 \begin{figure}
     \centering
-    \includegraphics[width=\textwidth]{../data/performance_plots/first_model.pdf}
-    \caption{The loss and accuracy curves for the initial model based on manual hyperparameter tuning.}
-    \label{fig:first_curves}
+    \includegraphics[width=\textwidth]{../data/performance_plots/GS1.pdf}
+    \caption{The loss and accuracy curves for the three best performing models in the first grid search.}
+    \label{fig:GS1}
 \end{figure}
 
 \begin{figure}
@@ -24,8 +42,18 @@ The code for this project can be found on \href{https://github.com/LukasBeiske/p
 \end{figure}
 
 \begin{figure}
-    \centering
-    \includegraphics[height=\textheight]{../data/best_model.png}
-    \caption{Schematic overview of the optimal network structure after hyperparameter tuning.}
-    \label{fig:best_model}
+    \centering    
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=0.99\textwidth]{../data/alternative_approach/example_image.pdf}
+        \caption{Image of a Marguerite Daisy.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=0.99\textwidth]{../data/alternative_approach/example_rgb_hist.pdf}
+        \caption{Resulting color histogram.}
+    \end{subfigure}
+    \caption{Color histograms are used to generate suitable input data for the kNN algorithm.}
+    \label{fig:kNN_hist}
 \end{figure}

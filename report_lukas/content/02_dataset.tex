@@ -1,16 +1,18 @@
 \section{Dataset and preprocessing}
 \label{sec:dataset}
-The dataset used in this project is called \textit{Flowers-299} and is published on \href{https://www.kaggle.com/bogdancretu/flower299}{kaggle} unter the \textit{CC0: Public Domain} license \cite{data}.
+The dataset used in this project is called \textit{Flowers-299} and is published on \href{https://www.kaggle.com/bogdancretu/flower299}{kaggle} with a \textit{CC0: Public Domain} license \cite{data}.
 It contains sorted images of 299 different flower species and for each species there are between 222 and 483 images which vary in size.
 The images contain one or multiple individual flowers of one species with varying backgrounds and drawings are also included.
-From among these we choose eleven species to include in our project.
+Some images are very similar to each other, because all the images where taken from Google Images using an image crawler script. 
+This can, for example, result in slightly cropped versions of the same image existing as two separate images within the dataset.
+From among these flower species we choose eleven species to include in our project.
 This number of species was chosen to limit the scale of the project with regards to the limited time and computing resources available to us.
-While selecting the eleven species we tried to include flowers that are more easily distinguishable for the human eye, as well as some which look quite similar.
+While selecting the eleven species we tried to include flowers which are more easily distinguishable for the human eye, as well as some which look quite similar.
 
 We use the \texttt{Python Image Library Pillow} \cite{pillow} to load the images and start by inspecting the distribution of their lengths and widths which can be seen in \autoref{fig:sizes}.
-In order to use the images as the input for a neural network all the images must be of the same size. 
+In order to use the images as the input for a neural network, all the images must be of the same size. 
 Therefore, we have to resize all the images to the same size.
-We choose $200\times200$ pixels for this, as most images have a bigger native size, no image artifacts will be created using this image size (which could happen by upscaling images).
+We choose $200\times200$ pixels for this, as most of the images have a bigger native size so no image artifacts will be created using this size (which could happen by upscaling images).
 A resized example image of each of the chosen flower species can be seen in \autoref{fig:images}.
 \begin{figure}
     \centering    
@@ -37,49 +39,41 @@ A resized example image of each of the chosen flower species can be seen in \aut
         \includegraphics[width=0.9\textwidth]{../example_images/BeeBalm.jpg}
         \caption{Bee Balm.}
     \end{subfigure}
-    \vspace{0.07cm}
     \begin{subfigure}{0.24\textwidth}
         \centering
         \includegraphics[width=0.9\textwidth]{../example_images/Black-eyedSusan.jpg}
         \caption{Black-eyed Susan.}
     \end{subfigure}
-    \vspace{0.07cm}
     \begin{subfigure}{0.24\textwidth}
         \centering
         \includegraphics[width=0.9\textwidth]{../example_images/BlanketFlower.jpg}
         \caption{Blanket Flower.}
     \end{subfigure}
-    \vspace{0.07cm}
     \begin{subfigure}{0.24\textwidth}
         \centering
         \includegraphics[width=0.9\textwidth]{../example_images/BleedingHeart.jpg}
         \caption{Bleeding Heart.}
     \end{subfigure}
-    \vspace{0.07cm}
     \begin{subfigure}{0.24\textwidth}
         \centering
         \includegraphics[width=0.9\textwidth]{../example_images/ButterflyBush.jpg}
         \caption{Butterfly Bush.}
     \end{subfigure}
-    \vspace{0.07cm}
     \begin{subfigure}{0.24\textwidth}
         \centering
         \includegraphics[width=0.9\textwidth]{../example_images/Dahlia.jpg}
         \caption{Dahlia.}
     \end{subfigure}
-    \vspace{0.07cm}
     \begin{subfigure}{0.24\textwidth}
         \centering
         \includegraphics[width=0.9\textwidth]{../example_images/FrangipaniFlower.jpg}
         \caption{Frangipani Flower.}
     \end{subfigure}
-    \vspace{0.07cm}
     \begin{subfigure}{0.24\textwidth}
         \centering
         \includegraphics[width=0.9\textwidth]{../example_images/GrapeHyacinth.jpg}
         \caption{Grape Hyacinth.}
     \end{subfigure}
-    \vspace{0.07cm}
     \begin{subfigure}{0.24\textwidth}
         \centering
         \includegraphics[width=0.9\textwidth]{../example_images/MargueriteDaisy.jpg}
@@ -99,13 +93,13 @@ A resized example image of each of the chosen flower species can be seen in \aut
     \label{fig:images}
 \end{figure}
 
-Another point to consider is, that some images might have very different widths and heights.
-This would lead to such images being heavily clinched or stretched along one axis which would greatly alter the form of the flower(s) in the image and potentially force the neural network 
+Another point to consider is, that some images have very different widths and heights.
+This leads to such images being heavily clinched or stretched along one axis which would greatly alter the form of the flower(s) in the image and potentially force the neural network 
 to learn image features that are not representative of flowers of its species.
-For this reason we look at the aspect ratios of the images in \autoref{fig:ratio} and decide to discard images with an aspect ratio smaller than 0.55 or bigger than $\sfrac{1}{0.55} = 1.82$. 
+For this reason we look at the aspect ratios of the images in \autoref{fig:ratio} and decide to discard images with an aspect ratio smaller than 0.55 or bigger than $\sfrac{1}{0.55} \approx 1.82$. 
 
 After this pre-selection the number of images for each of the flower species still varies.
-To avoid a bias towards over-represented species, we only use the first 334 images of each species from here on out.
+To avoid a bias towards over-represented species, we only use the first 334 images of each species from here on out, because the smallest number of images remaining for one of the species is 334.
 As a final preprocessing step, we split $\SI{15}{\percent}$ of the images into a test set (and $\SI{85}{\percent}$ as train set) that is not used until the final evaluation of the results.
 Finally we save both sets in \texttt{hdf5}-files to speed up loading times.
 All the steps described in this section are performed in the \texttt{preprocessing.ipynb} Jupyter-notebook.

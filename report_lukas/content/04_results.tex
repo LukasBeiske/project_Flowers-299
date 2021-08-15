@@ -1,15 +1,15 @@
 \section{Results and interpretation}
 \label{sec:results}
 Trying different network structures and extensive hyperparameter tuning results in a network which achieves an accuracy of $\SI{84.4}{\percent}$ on the validation set by using the
-hyperparameter values as seen in \autoref{tab:hyperparameters}.
+hyperparameter values shown in \autoref{tab:hyperparameters}.
 An overview of the final network can be seen in \autoref{fig:best_model}.
 \begin{table}
     \centering
-    \caption{A CNN using these hyperparameter values can solve our learning problem the best. *= In the first convolutional layer.}
+    \caption{A CNN using these hyperparameters can solve our problem the best. *= In the first convolutional layer and doubling from layer to layer afterwards.}
     \label{tab:hyperparameters}
     \begin{tabular}{c c c c c c c}
         \toprule
-        $N_\text{conv. layers}$ & ${\text{num}_\text{kernals}}^*$ & $N_\text{kernal}$ & $N_\text{dense layers}$ & $N_\text{dense nodes}$ & $r_\text{L2}$ & $r_\text{dropout}$ \\
+        $N_\text{conv. layers}$ & ${\text{num}_\text{kernels}}^*$ & $N_\text{kernel}$ & $N_\text{dense layers}$ & $N_\text{dense nodes}$ & $r_\text{L2}$ & $r_\text{dropout}$ \\
         \midrule
         5 & 48 & 4 & 1 & 128 & \num{1e-5} & 0.3\\
         \bottomrule
@@ -22,6 +22,10 @@ Using our best performing model we achieve
 \begin{align}
     \text{accuracy}_\text{test} = \SI{79.9}{\percent}.
 \end{align}
+The significant gap between validation accuracy and test accuracy ($\SI{4.5}{\percent}$) might be due to the extensive hyperparameter tuning, while the validation and test datasets are quite small 
+(50 images of each flower species).
+This might lead to manual overfitting on the validation set during hyperparameter tuning.
+
 It is also helpful to examine the distribution of the predicted probability for a single species, while distinguishing between the images which truly show a flower(s) of this species and
 all other images.
 This is done in \autoref{fig:hist} for \enquote{Marguerite Daisy}.
@@ -43,31 +47,32 @@ Another import graphic for evaluating a classification is the \textit{confusion 
     \end{subfigure}
     \caption{The predicted probabilities for the class \enquote{Marguerite Daisy} and the confusion matrix based on the test data set help to illustrate the performance of our classification model.}
 \end{figure}
-The probability distribution shows that out network is generally pretty certain in its classification of Marguerite Daisys, as most images (regardless if correctly classified or not) 
+The probability distribution shows that out network is generally pretty certain of its classification of Marguerite Daisies, as most images (regardless if correctly classified or not) 
 are in the highest or lowest bin.
 
-If we look at both plots, we can see however, that \enquote{Marguerite Daisy} is the class which gets misclassified the most as only 31 of 50 images of Marguerite Daisys in the test set get 
+If we look at both plots, we can see, that \enquote{Marguerite Daisy} is the class which gets misclassified the most as only 31 of 50 images of Marguerite Daisies in the test set get 
 classified as such.
-They get confused with Waterlilies the most, which, looking at \autoref{fig:images}, could be because of similarities in color and pedal shape.
-However, there are also images of Waterlilies of different colors in our dataset
-So it might be the case, that Waterlilies are the species which is truly hard to correctly classify and the (weak) classification criteria for Waterlilies just happen to also apply to Marguerite Daisys
+They get confused with Waterlilies the most, which, looking at \autoref{fig:images}, might be caused by similarities in color and petal shape.
+However, there are also images of Waterlilies with different colors in our dataset
+So it might be the case, that Waterlilies are the species which is hard to correctly classify and the (weak) classification criteria for Waterlilies just happen to also apply to Marguerite Daisies
 quite often.
-Another interesting observation in \autoref{fig:matrix} is, that Butterfly Bushs get confused a lot with Bee Balm flowers and Grape Hyacinths.
+Another interesting observation in \autoref{fig:matrix} is, that Butterfly Bushs get confused with Bee Balm flowers and Grape Hyacinths a lot.
 Bee Balm flowers come in very similar colors to Butterfly Bushes and the tattered-looking blossoms of Bee Balm flowers can look very similar to Butterfly Bushs which have already lost some of their 
 blossoms.
 The purple color and general shape of the flower head of Grape Hyacinths can make them look very much like Butterfly Bushs on images.
-In reality the size of the flower head is very different, but this is not an information which our network knows.
+In reality the size of the flower head is very different, but this is not an information which our network has access to.
 However, real images of Grape Hyacinths do not get misclassified at all within our test set.
-This can be caused by the very distinctive ball-like pedal-shape (see \autoref{fig:images}) which our network can probably detect very accurately. 
+This can be caused by the very distinctive ball-like petal-shape (see \autoref{fig:images}) which our network can probably detect very reliably in real images of Grape Hyacinths.
+More interpretations like these for the other flower species are possible.
 
-The six images which the network misclassifies with the highest certainty in its wrong prediction are shown in \autoref{fig:errors}.
-\begin{figure}
+\begin{wrapfigure}{R}{0.75\textwidth}
     \centering
-    \includegraphics[width=0.8\textwidth]{../data/eval_plots_test/biggest_errors.pdf}
+    \includegraphics[width=0.75\textwidth]{../data/eval_plots_test/biggest_errors.pdf}
     \caption{These six images get misclassified with the highest certainty in the wrong prediction.}
     \label{fig:errors}
-\end{figure}
-The image in the top left looks very similar to a Blanket Flower (like the one in the top middle) and the bottom left bottom middle and top right image are drawings and have
+\end{wrapfigure}
+The six images which the network misclassifies with the highest certainty in its wrong prediction are shown in \autoref{fig:errors}.
+The image in the top left looks very similar to a Blanket Flower (like the one in the top middle) and the bottom left, bottom middle and top right image are drawings and have
 a white/ white-grey background which probably makes it harder for the network due to a lack of contrast.
 The Waterlilies on the bottom right image are very small and its color is very similar to a Grape Hyacinth, so this misclassification is understandable.
 The only strange misclassification is the image in the top middle.
@@ -75,3 +80,27 @@ A possible explanation is the network detecting something in the background of t
 
 
 \subsection{Alternative method}
+In order to get a reference to compare the performance of our network to, we also try a different approach to the classification based on the eleven flower species.
+We choose a \textit{k-Nearest Neighbor} Algorithm (kNN) for this task, because it is one of the simplest machine-learning algorithms (\textit{lazy learner}). 
+Suitable input data for the kNN is generated by looking at a histogram of the color intensity of all three RGB colors (red, green, blue) for all pixels in an image.
+An example of this can be seen in \autoref{fig:kNN_hist}.
+Then the mean and the standart deviation for each color channel are calculated and used as input data for the kNN.
+This results in an reduction of $200\cdot 200 \cdot 3 = 120.000$ parameters for each image to only $6$ parameters for each image.
+
+The main hyperparameters of the kNN algorithm is the number of neighbors $k$ to consider for the classification of a new datapoint, as well as the distance metric used to decide which points are 
+the nearest ones.
+We use the implementation of a kNN classifier in \texttt{scikit-learn} \cite{scikit-learn} with its default \textit{Euclidean distance} as distance metric.
+We then search for the optimal $k$ by looking at the accuracy the algorithm achieves on the validation data set for $k \in [1, 300]$ which can be seen in \autoref{fig:kNN_acc}.
+\begin{wrapfigure}{r}{0.55\textwidth}
+    \centering
+    \includegraphics[width=0.55\textwidth]{../data/alternative_approach/accuracy_knn_threshold_300.pdf}
+    \caption{The validation accuracy of the kNN algorithm for different $k$.}
+    \label{fig:kNN_acc}
+\end{wrapfigure}
+We discard $k = 1, 2$, because there are images which are almost identical between the train and test set which distort the results for $k = 1, 2$.
+Therefore, $k = 82$ results in the best validation accuracy of $\SI{39.0}{\percent}$.
+Applying this kNN model on the test set achieves a classification accuracy of 
+\begin{align}
+    \text{accuracy}_\text{test, kNN} = \SI{37.0}{\percent}.
+\end{align}
+Considering the simplicity of the approach, this result is within an expected margin.

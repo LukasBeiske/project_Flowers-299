@@ -63,15 +63,13 @@
 \usepackage{float}
 \floatplacement{figure}{htbp}
 \floatplacement{table}{htbp}
+\renewcommand{\floatpagefraction}{.8}
 
-% Floats innerhalb einer Section halten
-\usepackage[
-  section, % Floats innerhalb der Section halten
-  below,   % unterhalb der Section aber auf der selben Seite ist ok
-]{placeins}
+% Floats umgeben von Text
+\usepackage{wrapfig}
 
-% Seite drehen für breite Tabellen: landscape Umgebung
-\usepackage{pdflscape}
+% Float Positionen
+\usepackage{placeins}
 
 % Captions
 \usepackage{caption}
@@ -103,12 +101,17 @@
   width=0.9\textwidth,            % maximale Breite einer Caption schmaler
 }
 
+% Reduce whitespace
+\setlength{\abovecaptionskip}{2mm}
+\setlength{\belowcaptionskip}{2mm}
+\setlength{\floatsep}{2mm}
+\setlength{\textfloatsep}{2mm}
 
 % Literaturverzeichnis
 \usepackage[
   backend=biber,
 ]{biblatex}
-% Quellendatenbank
+
 \addbibresource{lit.bib}
 \addbibresource{programme.bib}
 
@@ -119,6 +122,7 @@
   pdfcreator={},  % ┐ PDF-Attribute säubern
   pdfproducer={}, % ┘
 ]{hyperref}
+
 % erweiterte Bookmarks im PDF
 \usepackage{bookmark}
 
